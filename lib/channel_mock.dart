@@ -78,7 +78,7 @@ class ChannelMock {
   ///
   /// Only the first matching invocation is executed when the mock is called
   /// If you want to have a catchall (no arguments), make sure it comes last
-  MockInvocation when(String method, [ ArgumentMatcher argMatcher ]) {
+  MockInvocation when(String method, [ArgumentMatcher argMatcher]) {
     List<MockInvocation> invocations;
     if (_callHandlers.containsKey(method)) {
       invocations = _callHandlers[method];
@@ -86,7 +86,8 @@ class ChannelMock {
       invocations = _callHandlers[method] = <MockInvocation>[];
     }
 
-    final MockInvocation nextInvocation = new MockInvocation._(this, argMatcher);
+    final MockInvocation nextInvocation =
+        new MockInvocation._(this, argMatcher);
     invocations.add(nextInvocation);
 
     return nextInvocation;
@@ -99,8 +100,8 @@ class ChannelMock {
 typedef dynamic MockCallHandler(int handle, dynamic arguments);
 
 /// Function that generates the arguments to use in a channel response
-typedef dynamic ResponseArgumentGenerator(int callHandle, dynamic callArguments);
-
+typedef dynamic ResponseArgumentGenerator(
+    int callHandle, dynamic callArguments);
 
 /// Class to handle mocking invocations of our channel methods
 ///
@@ -111,11 +112,12 @@ class MockInvocation {
   ArgumentMatcher _argumentMatcher;
   MockCallHandler _executor;
 
-  MockInvocation._(this._parent, [ this._argumentMatcher ]);
+  MockInvocation._(this._parent, [this._argumentMatcher]);
 
   bool _matches(dynamic arguments) {
     // If (no arguments or arguments match) and has an executor
-    return (_argumentMatcher == null || _argumentMatcher._matches(arguments)) && _executor != null;
+    return (_argumentMatcher == null || _argumentMatcher._matches(arguments)) &&
+        _executor != null;
   }
 
   dynamic _run(int handle, dynamic arguments) {
@@ -153,7 +155,8 @@ class MockInvocation {
   }
 
   /// Send a mock response back along the channel
-  ChannelMock thenRespond(String responseMethod, [
+  ChannelMock thenRespond(
+    String responseMethod, [
     ResponseArgumentGenerator createResponseArguments,
     ui.PlatformMessageResponseCallback responseCallback,
   ]) {
@@ -168,9 +171,10 @@ class MockInvocation {
         _parent._channel.codec.encodeMethodCall(
           new MethodCall(responseMethod, responseArguments),
         ),
-            (respBytes) {
+        (respBytes) {
           if (responseCallback != null) {
-            dynamic channelResponse = _parent._channel.codec.decodeEnvelope(respBytes);
+            dynamic channelResponse =
+                _parent._channel.codec.decodeEnvelope(respBytes);
             responseCallback(channelResponse);
           }
         },
@@ -196,8 +200,7 @@ class ArgumentMatcher {
 
   /// Method arguments must match exactly.
   /// This uses an `unordered` compare if _args is a collection
-  ArgumentMatcher.exactly(this._args)
-      : _type = _MatcherType.Exact;
+  ArgumentMatcher.exactly(this._args) : _type = _MatcherType.Exact;
 
   /// Method arguments must contain certain values
   /// This assumes you are using "named"-style arguments with a map
@@ -209,7 +212,8 @@ class ArgumentMatcher {
   bool _matches(dynamic arguments) {
     switch (_type) {
       case _MatcherType.Exact:
-        return _args == arguments || collectionEquality.equals(arguments, _args);
+        return _args == arguments ||
+            collectionEquality.equals(arguments, _args);
 
       case _MatcherType.Partial:
         if (arguments is Map<String, dynamic>) {
@@ -218,7 +222,8 @@ class ArgumentMatcher {
 
           // Make sure each specified key matches. Ignore the others.
           return match.keys.every((key) =>
-          argMap[key] == match[key] || collectionEquality.equals(match[key], argMap[key]));
+              argMap[key] == match[key] ||
+              collectionEquality.equals(match[key], argMap[key]));
         }
         break;
     }

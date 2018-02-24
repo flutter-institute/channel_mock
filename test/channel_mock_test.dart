@@ -35,19 +35,20 @@ void main() {
 
   test('default handler', () async {
     // Returns null before being set
-    dynamic result = await channel.invokeMethod('identity', { 'channel': 'test'});
+    dynamic result =
+        await channel.invokeMethod('identity', {'channel': 'test'});
     expect(result, isNull);
 
     // Set up the handle to return an object
-    Map<String, String> expected = { 'result': 'our mock is functional'};
+    Map<String, String> expected = {'result': 'our mock is functional'};
     mock.otherwise().thenReturn(expected);
 
-    result = await channel.invokeMethod('identity', { 'channel': 'test'});
+    result = await channel.invokeMethod('identity', {'channel': 'test'});
     expect(result, equals(expected));
 
     // Overrides to return a different value
     mock.otherwise().thenReturn(true);
-    result = await channel.invokeMethod('identity', { 'channel': 'test'});
+    result = await channel.invokeMethod('identity', {'channel': 'test'});
     expect(result, isTrue);
   });
 
@@ -84,7 +85,7 @@ void main() {
     expect(result, equals('this is my string'));
 
     mock.reset();
-    Map<String, String> expected = { 'result': 'our mock is functional'};
+    Map<String, String> expected = {'result': 'our mock is functional'};
     mock.when('handler').thenReturn(expected);
     result = await channel.invokeMethod('handler');
     expect(result, equals(expected));
@@ -100,7 +101,7 @@ void main() {
 
   test('when.call', () async {
     bool wasCalled = false;
-    Map args = { 'key': 'value'};
+    Map args = {'key': 'value'};
 
     mock.when('calling').thenCall((handle, arguments) {
       wasCalled = true;
@@ -119,17 +120,16 @@ void main() {
 
     mock.when('ping').thenRespond(
       'identity',
-          (handle, args) =>
-      {
-        'callArgs': args,
-        'genArgs': [1, 2, 3],
-      },
-          (result) {
+      (handle, args) => {
+            'callArgs': args,
+            'genArgs': [1, 2, 3],
+          },
+      (result) {
         completer.complete(result);
       },
     );
 
-    dynamic result = await channel.invokeMethod('ping', { 'key': 'value'});
+    dynamic result = await channel.invokeMethod('ping', {'key': 'value'});
     expect(result, equals(0)); // The handle
 
     // Wait for the callback to finish
@@ -137,7 +137,7 @@ void main() {
 
     // This is what our generated arguments should look like
     Map<String, dynamic> expectedResult = {
-      'callArgs': { 'key': 'value'},
+      'callArgs': {'key': 'value'},
       'genArgs': [1, 2, 3],
     };
     expect(callbackResult, equals(expectedResult));
@@ -152,18 +152,28 @@ void main() {
 
   test('when calls catchall if declared first', () async {
     mock.when('catchit').thenReturn('was default');
-    mock.when('catchit', new ArgumentMatcher.exactly(1)).thenReturn('was other');
+    mock
+        .when('catchit', new ArgumentMatcher.exactly(1))
+        .thenReturn('was other');
 
     dynamic result = await channel.invokeMethod('catchit', 1);
     expect(result, equals('was default'));
   });
 
   test('when with ArgumentMatcher.exactly', () async {
-    final Map<String, String> objectArg = { 'this': 'object', 'has': 'values'};
-    mock.when('handler', new ArgumentMatcher.exactly(objectArg)).thenReturn('was object');
-    mock.when('handler', new ArgumentMatcher.exactly([1, 2, 3])).thenReturn('was list');
-    mock.when('handler', new ArgumentMatcher.exactly(true)).thenReturn('was boolean');
-    mock.when('handler', new ArgumentMatcher.exactly('my string')).thenReturn('was string');
+    final Map<String, String> objectArg = {'this': 'object', 'has': 'values'};
+    mock
+        .when('handler', new ArgumentMatcher.exactly(objectArg))
+        .thenReturn('was object');
+    mock
+        .when('handler', new ArgumentMatcher.exactly([1, 2, 3]))
+        .thenReturn('was list');
+    mock
+        .when('handler', new ArgumentMatcher.exactly(true))
+        .thenReturn('was boolean');
+    mock
+        .when('handler', new ArgumentMatcher.exactly('my string'))
+        .thenReturn('was string');
     mock.when('handler').thenReturn('was default');
 
     dynamic result = await channel.invokeMethod('handler', 'my string');
@@ -171,7 +181,8 @@ void main() {
 
     result = await channel.invokeMethod('handler', objectArg);
     expect(result, equals('was object'));
-    result = await channel.invokeMethod('handler', { 'this': 'object', 'has': 'values'});
+    result = await channel
+        .invokeMethod('handler', {'this': 'object', 'has': 'values'});
     expect(result, equals('was object'));
 
     result = await channel.invokeMethod('handler', [1, 2, 3]);
@@ -182,7 +193,7 @@ void main() {
 
     result = await channel.invokeMethod('handler', 'other string');
     expect(result, equals('was default'));
-    result = await channel.invokeMethod('handler', { 'other': 'object'});
+    result = await channel.invokeMethod('handler', {'other': 'object'});
     expect(result, equals('was default'));
     result = await channel.invokeMethod('handler', ['other', 'list']);
     expect(result, equals('was default'));
@@ -198,15 +209,32 @@ void main() {
       'int': 12345,
       'double': 3.141,
       'list': [1, 2, 3, 4, 5],
-      'obj': { 'key': 'value', 'second': 'entry'},
+      'obj': {'key': 'value', 'second': 'entry'},
     };
 
-    mock.when('handler', new ArgumentMatcher.contains({ 'string': 'my string'})).thenReturn('was string');
-    mock.when('handler', new ArgumentMatcher.contains({ 'double': 3.141})).thenReturn('was double');
-    mock.when('handler', new ArgumentMatcher.contains({ 'int': 12345})).thenReturn('was int');
-    mock.when('handler', new ArgumentMatcher.contains({ 'obj': { 'key': 'value', 'second': 'entry'}})).thenReturn(
-        'was obj');
-    mock.when('handler', new ArgumentMatcher.contains({ 'list': [1, 2, 3, 4, 5]})).thenReturn('was list');
+    mock
+        .when('handler', new ArgumentMatcher.contains({'string': 'my string'}))
+        .thenReturn('was string');
+    mock
+        .when('handler', new ArgumentMatcher.contains({'double': 3.141}))
+        .thenReturn('was double');
+    mock
+        .when('handler', new ArgumentMatcher.contains({'int': 12345}))
+        .thenReturn('was int');
+    mock
+        .when(
+            'handler',
+            new ArgumentMatcher.contains({
+              'obj': {'key': 'value', 'second': 'entry'}
+            }))
+        .thenReturn('was obj');
+    mock
+        .when(
+            'handler',
+            new ArgumentMatcher.contains({
+              'list': [1, 2, 3, 4, 5]
+            }))
+        .thenReturn('was list');
     mock.when('handler').thenReturn('was default');
 
     // Matches in-order
@@ -225,14 +253,18 @@ void main() {
     result = await channel.invokeMethod('handler', args);
     expect(result, equals('was obj'));
     // Keys is other order
-    result = await channel.invokeMethod('handler', { 'obj': { 'second': 'entry', 'key': 'value'}});
+    result = await channel.invokeMethod('handler', {
+      'obj': {'second': 'entry', 'key': 'value'}
+    });
     expect(result, equals('was obj'));
     args.remove('obj');
 
     result = await channel.invokeMethod('handler', args);
     expect(result, equals('was list'));
     // Entries in other order
-    result = await channel.invokeMethod('handler', { 'list': [5, 4, 3, 2, 1]});
+    result = await channel.invokeMethod('handler', {
+      'list': [5, 4, 3, 2, 1]
+    });
     expect(result, equals('was list'));
     args.remove('list');
 
@@ -241,15 +273,19 @@ void main() {
     expect(result, equals('was default'));
 
     // Check that keys with wrong value don't match
-    result = await channel.invokeMethod('handler', { 'string': 'other value'});
+    result = await channel.invokeMethod('handler', {'string': 'other value'});
     expect(result, equals('was default'));
-    result = await channel.invokeMethod('handler', { 'int': 54321});
+    result = await channel.invokeMethod('handler', {'int': 54321});
     expect(result, equals('was default'));
-    result = await channel.invokeMethod('handler', { 'double': 6.282});
+    result = await channel.invokeMethod('handler', {'double': 6.282});
     expect(result, equals('was default'));
-    result = await channel.invokeMethod('handler', { 'list': [1, 2, 3]});
+    result = await channel.invokeMethod('handler', {
+      'list': [1, 2, 3]
+    });
     expect(result, equals('was default'));
-    result = await channel.invokeMethod('handler', { 'obj': { 'key': 'value'}});
+    result = await channel.invokeMethod('handler', {
+      'obj': {'key': 'value'}
+    });
     expect(result, equals('was default'));
   });
 }
