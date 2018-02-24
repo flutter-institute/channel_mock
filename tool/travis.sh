@@ -40,4 +40,4 @@ echo "PASSED"
 # Fail on anything that fails going forward.
 set -e
 
-flutter test
+./flutter/bin/flutter test
