@@ -1,4 +1,4 @@
-language: dart
+language: flutter
 sudo: false
 dart:
   - dev
