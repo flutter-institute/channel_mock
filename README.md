@@ -1,6 +1,10 @@
-# channel_mock
+# Channel Mock
 
-A package to help mock communications channels in Flutter
+[![Build Status](https://api.travis-ci.org/flutter-institute/channel_mock.svg?branch=master)](https://travis-ci.org/flutter-institute/channel_mock)
+
+A package to help mock plugin communication channels (`MethodChannel`) in Flutter.
+
+This plugin is also available on [pub](https://pub.dartlang.org/packages/channel_mock)
 
 ## Getting Started
 
