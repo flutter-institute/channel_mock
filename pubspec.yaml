@@ -1,0 +1,14 @@
+name: channel_mock
+description: A package to help mock communications channels in Flutter
+author: Brian Armstrong <brian@flutter.institute>
+homepage: https://github.com/flutter-institute/channel_mock
+version: 0.0.1
+
+dependencies:
+  collection: "^1.14.5"
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

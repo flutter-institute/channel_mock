@@ -1,0 +1,21 @@
+# Files and directories created by pub
+.packages
+.pub/
+build/
+# Remove the following pattern if you wish to check in your lock file
+pubspec.lock
+.DS_Store
+
+# Directory created by dartdoc
+doc/api/
+
+# Directories that are created by flutter that we don't actually need checked in
+ios/*
+
+# IDE files
+.idea/
+.atom/
+*.iml
+*.ipr
+*.iws
+.vscode/*
