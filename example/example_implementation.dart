@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:channel_mock/channel_mock.dart';
 
-
 // This library is meant for mocking flutter method channels during unit tests
 // This example file is of a mock for FirebaseAuth
 void main() {
@@ -47,12 +46,10 @@ void main() {
     // So when we start listening, we have to emulate this platform call
     mock.when('startListeningAuthState').thenRespond(
         'onAuthStateChanged',
-            (handle, _) =>
-        <String, dynamic>{
-          'id': handle,
-          'user': mockUserData,
-        }
-    );
+        (handle, _) => <String, dynamic>{
+              'id': handle,
+              'user': mockUserData,
+            });
 
     // Use a Completer so we can wait on the results of `onAuthStateChanged`
     Completer doneListening = new Completer();

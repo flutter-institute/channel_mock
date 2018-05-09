@@ -34,11 +34,10 @@ class FirebaseAuthMock extends ChannelMock {
 
     when('startListeningAuthState').thenRespond(
       'onAuthStateChanged',
-          (handle, _) =>
-      <String, dynamic>{
-        'id': handle,
-        'user': mockUserData,
-      },
+      (handle, _) => <String, dynamic>{
+            'id': handle,
+            'user': mockUserData,
+          },
     );
 
     otherwise().thenReturn(mockUserData);
@@ -53,7 +52,7 @@ void main() {
     mock = new FirebaseAuthMock();
   });
 
-  test('it has already mocked the onAuthStateChanged listener', () {
+  test('it has already mocked the onAuthStateChanged listener', () async {
     // NOTE: no additional setup with the mock required
 
     // Use a Completer so we can wait on the results of `onAuthStateChanged`

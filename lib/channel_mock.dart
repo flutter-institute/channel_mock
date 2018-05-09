@@ -7,6 +7,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:collection/collection.dart';
 
+/// Type for the callback for the `thenResponse` callback
+typedef void ChannelMockResponseCallback(dynamic decodedResult);
+
 /// Wrap a channel in a mock implementation
 ///
 /// This mock allows you to override specific methods for the channel
@@ -39,7 +42,7 @@ class ChannelMock {
     final dynamic arguments = methodCall.arguments;
 
     // Log the call for verification later
-    List<MethodCall> calls;
+    List<dynamic> calls;
     if (_callLog.containsKey(method)) {
       calls = _callLog[method];
     } else {
@@ -158,7 +161,7 @@ class MockInvocation {
   ChannelMock thenRespond(
     String responseMethod, [
     ResponseArgumentGenerator createResponseArguments,
-    ui.PlatformMessageResponseCallback responseCallback,
+    ChannelMockResponseCallback responseCallback,
   ]) {
     _executor = (handle, arguments) {
       dynamic responseArguments;
@@ -216,14 +219,15 @@ class ArgumentMatcher {
             collectionEquality.equals(arguments, _args);
 
       case _MatcherType.Partial:
-        if (arguments is Map<String, dynamic>) {
-          final Map<String, dynamic> argMap = arguments;
-          final Map<String, dynamic> match = _args as Map<String, dynamic>;
+        if (arguments is Map && _args is Map) {
+          final Map<dynamic, dynamic> argMap = arguments;
+          final Map<String, dynamic> match = _args;
 
           // Make sure each specified key matches. Ignore the others.
           return match.keys.every((key) =>
-              argMap[key] == match[key] ||
-              collectionEquality.equals(match[key], argMap[key]));
+              argMap.containsKey(key) &&
+              (argMap[key] == match[key] ||
+                  collectionEquality.equals(match[key], argMap[key])));
         }
         break;
     }
