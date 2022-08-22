@@ -8,7 +8,4 @@ This plugin is also available on [pub](https://pub.dartlang.org/packages/channel
 
 ## Getting Started
 
-For help getting started with Flutter, view the online [documentation](http://flutter.io/).
-You can also visit us at [Flutter Institute](https://flutter.institute)
-
-For help on editing package code, view the [documentation](https://flutter.io/developing-packages/).
+Reference the [two example dart files](https://github.com/flutter-institute/channel_mock/tree/master/example) to see how to use this package.

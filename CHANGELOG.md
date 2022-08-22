@@ -1,3 +1,7 @@
+## [2.0.0+1] - 2022-08-22
+
+* Fixing up the README for more pub points
+
 ## [2.0.0] - 2022-08-22
 
 * Updating to be compatible with dart 2 and nullsafety

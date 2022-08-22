@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:channel_mock/channel_mock.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late MethodChannel channel;
   late ChannelMock mock;
   late List<MethodCall> channelLog;
