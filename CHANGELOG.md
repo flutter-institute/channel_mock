@@ -1,3 +1,7 @@
+## [2.0.0] - 2022-08-22
+
+* Updating to be compatible with dart 2 and nullsafety
+
 ## [0.0.2] - 2018-02-24
 
 * No functionality changes. This was all aesthetic.

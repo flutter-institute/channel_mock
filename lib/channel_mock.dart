@@ -1,9 +1,8 @@
 // Copyright (c) 2018, Brian Armstrong. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:collection/collection.dart';
 
 /// Type for the callback for the `thenResponse` callback
@@ -16,10 +15,10 @@ typedef void ChannelMockResponseCallback(dynamic decodedResult);
 class ChannelMock {
   final MethodChannel _channel;
 
-  int _mockHandleId;
-  Map<String, List<dynamic>> _callLog;
-  Map<String, List<MockInvocation>> _callHandlers;
-  MockInvocation _defaultHandler;
+  late int _mockHandleId;
+  late Map<String, List<dynamic>> _callLog;
+  late Map<String, List<MockInvocation>> _callHandlers;
+  late MockInvocation? _defaultHandler;
 
   ChannelMock(this._channel) {
     reset();
@@ -27,44 +26,40 @@ class ChannelMock {
 
   void reset() {
     _mockHandleId = 0;
-    _callLog = new Map<String, List<dynamic>>();
-    _callHandlers = new Map<String, List<MockInvocation>>();
+    _callLog = {};
+    _callHandlers = {};
     _defaultHandler = null;
 
-    _channel.setMockMethodCallHandler(_methodCallHandler);
+    TestDefaultBinaryMessengerBinding.instance!.defaultBinaryMessenger
+        .setMockMethodCallHandler(_channel, _methodCallHandler);
   }
 
   Map<String, List<dynamic>> get log => _callLog;
 
-  Future<dynamic> _methodCallHandler(MethodCall methodCall) async {
-    final String method = methodCall.method;
-    final dynamic arguments = methodCall.arguments;
+  Future<Object?> _methodCallHandler(MethodCall methodCall) async {
+    final method = methodCall.method;
+    final arguments = methodCall.arguments;
 
     // Log the call for verification later
-    List<dynamic> calls;
-    if (_callLog.containsKey(method)) {
-      calls = _callLog[method];
-    } else {
-      calls = _callLog[method] = <dynamic>[];
-    }
-    calls.add(arguments);
+    _callLog[method] ??= [];
+    _callLog[method]!.add(arguments);
 
     // Handle if with our invocations, if we have one
-    final int handle = _mockHandleId++;
+    final handle = _mockHandleId++;
     if (_callHandlers.containsKey(method)) {
       // Find the first invocation that matches
-      final MockInvocation toInvoke = _callHandlers[method]
-          .firstWhere((matcher) => matcher._matches(arguments));
+      final toInvokeIdx = _callHandlers[method]!
+          .indexWhere((matcher) => matcher._matches(arguments));
 
       // Only execute and return the value from the first match
-      if (toInvoke != null) {
-        return toInvoke._run(handle, arguments);
+      if (toInvokeIdx >= 0) {
+        return _callHandlers[method]![toInvokeIdx]._run(handle, arguments);
       }
     }
 
     // No matching invocation, use the default handler, if we have one
     if (_defaultHandler != null) {
-      return _defaultHandler._run(handle, methodCall);
+      return _defaultHandler!._run(handle, methodCall);
     }
 
     // By default, just return null
@@ -73,24 +68,18 @@ class ChannelMock {
 
   /// Add a default handler as a catchall
   MockInvocation otherwise() {
-    return _defaultHandler = new MockInvocation._(this);
+    return _defaultHandler = MockInvocation._(this);
   }
 
   /// Add a mock implementation for the given method
   ///
   /// Only the first matching invocation is executed when the mock is called
   /// If you want to have a catchall (no arguments), make sure it comes last
-  MockInvocation when(String method, [ArgumentMatcher argMatcher]) {
-    List<MockInvocation> invocations;
-    if (_callHandlers.containsKey(method)) {
-      invocations = _callHandlers[method];
-    } else {
-      invocations = _callHandlers[method] = <MockInvocation>[];
-    }
+  MockInvocation when(String method, [ArgumentMatcher? argMatcher]) {
+    _callHandlers[method] ??= [];
 
-    final MockInvocation nextInvocation =
-        new MockInvocation._(this, argMatcher);
-    invocations.add(nextInvocation);
+    final nextInvocation = MockInvocation._(this, argMatcher);
+    _callHandlers[method]!.add(nextInvocation);
 
     return nextInvocation;
   }
@@ -111,20 +100,21 @@ typedef dynamic ResponseArgumentGenerator(
 /// And the behavior for what the invocation should do
 class MockInvocation {
   final ChannelMock _parent;
-  ArgumentMatcher _argumentMatcher;
-  MockCallHandler _executor;
+  ArgumentMatcher? _argumentMatcher;
+  MockCallHandler? _executor;
 
   MockInvocation._(this._parent, [this._argumentMatcher]);
 
   bool _matches(dynamic arguments) {
     // If (no arguments or arguments match) and has an executor
-    return (_argumentMatcher == null || _argumentMatcher._matches(arguments)) &&
+    return (_argumentMatcher == null ||
+            _argumentMatcher!._matches(arguments)) &&
         _executor != null;
   }
 
   dynamic _run(int handle, dynamic arguments) {
     if (_executor != null) {
-      return _executor(handle, arguments);
+      return _executor!(handle, arguments);
     }
     return null;
   }
@@ -159,8 +149,8 @@ class MockInvocation {
   /// Send a mock response back along the channel
   ChannelMock thenRespond(
     String responseMethod, [
-    ResponseArgumentGenerator createResponseArguments,
-    ChannelMockResponseCallback responseCallback,
+    ResponseArgumentGenerator? createResponseArguments,
+    ChannelMockResponseCallback? responseCallback,
   ]) {
     _executor = (handle, arguments) {
       dynamic responseArguments;
@@ -168,15 +158,16 @@ class MockInvocation {
         responseArguments = createResponseArguments(handle, arguments);
       }
 
-      BinaryMessages.handlePlatformMessage(
+      ServicesBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
         _parent._channel.name,
         _parent._channel.codec.encodeMethodCall(
-          new MethodCall(responseMethod, responseArguments),
+          MethodCall(responseMethod, responseArguments),
         ),
         (respBytes) {
           if (responseCallback != null) {
-            dynamic channelResponse =
-                _parent._channel.codec.decodeEnvelope(respBytes);
+            final channelResponse = respBytes == null
+                ? null
+                : _parent._channel.codec.decodeEnvelope(respBytes);
             responseCallback(channelResponse);
           }
         },

@@ -9,9 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:channel_mock/channel_mock.dart';
 
 void main() {
-  MethodChannel channel;
-  ChannelMock mock;
-  List<MethodCall> channelLog;
+  late MethodChannel channel;
+  late ChannelMock mock;
+  late List<MethodCall> channelLog;
 
   setUp(() {
     channelLog = [];
@@ -121,9 +121,9 @@ void main() {
     mock.when('ping').thenRespond(
       'identity',
       (handle, args) => {
-            'callArgs': args,
-            'genArgs': [1, 2, 3],
-          },
+        'callArgs': args,
+        'genArgs': [1, 2, 3],
+      },
       (result) {
         completer.complete(result);
       },

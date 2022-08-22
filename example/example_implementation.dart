@@ -16,9 +16,9 @@ void main() {
     'plugins.flutter.io/firebase_auth',
   );
 
-  ChannelMock mock;
+  late ChannelMock mock;
 
-  var mockUserData = {
+  final mockUserData = {
     'uid': 'mock-uid',
     'providerData': [
       {
@@ -77,7 +77,8 @@ void main() {
       return newUser;
     });
 
-    FirebaseUser result = await FirebaseAuth.instance.signInWithGoogle('mock-id-token', 'mock-access-token');
+    FirebaseUser result = await FirebaseAuth.instance
+        .signInWithGoogle('mock-id-token', 'mock-access-token');
     expect(result.uid, equals('mock-uid'));
     expect(result.email, equals('mock-id-token@mock-access-token'));
   });
@@ -87,7 +88,8 @@ void main() {
     mock.otherwise().thenReturn(mockUserData);
 
     // Because we didn't mock this method specifically, it just returns the mock user data
-    FirebaseUser user = Firebase.instance.createUserWithEmailAndPassword('mock-email', 'mock-password');
+    FirebaseUser user = Firebase.instance
+        .createUserWithEmailAndPassword('mock-email', 'mock-password');
     expect(user.uid, equals('mock-uid'));
   });
 }
