@@ -1,6 +1,7 @@
 # Channel Mock
 
 [![Codemagic build status](https://api.codemagic.io/apps/633339ce6e6d53a9c831d837/633339ce6e6d53a9c831d836/status_badge.svg)](https://codemagic.io/apps/633339ce6e6d53a9c831d837/633339ce6e6d53a9c831d836/latest_build)
+[![Pub Version](https://img.shields.io/pub/v/channel_mock)](https://pub.dev/packages/channel_mock)
 
 A package to help mock plugin communication channels (`MethodChannel`) in Flutter.
 
