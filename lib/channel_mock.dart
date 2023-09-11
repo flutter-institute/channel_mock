@@ -20,20 +20,23 @@ class ChannelMock {
   late Map<String, List<MockInvocation>> _callHandlers;
   late MockInvocation? _defaultHandler;
 
+  /// Initialize a channel mock for the given channel
   ChannelMock(this._channel) {
     reset();
   }
 
+  /// Reset the mock to its default state
   void reset() {
     _mockHandleId = 0;
     _callLog = {};
     _callHandlers = {};
     _defaultHandler = null;
 
-    TestDefaultBinaryMessengerBinding.instance!.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, _methodCallHandler);
   }
 
+  /// Return the log of all calls made to the mock since the last reset
   Map<String, List<dynamic>> get log => _callLog;
 
   Future<Object?> _methodCallHandler(MethodCall methodCall) async {
@@ -158,7 +161,7 @@ class MockInvocation {
         responseArguments = createResponseArguments(handle, arguments);
       }
 
-      ServicesBinding.instance.defaultBinaryMessenger.handlePlatformMessage(
+      ServicesBinding.instance.channelBuffers.push(
         _parent._channel.name,
         _parent._channel.codec.encodeMethodCall(
           MethodCall(responseMethod, responseArguments),
@@ -189,7 +192,7 @@ class ArgumentMatcher {
   final _MatcherType _type;
   final dynamic _args;
 
-  final collectionEquality = const DeepCollectionEquality.unordered();
+  final _collectionEquality = const DeepCollectionEquality.unordered();
 
   /// Method arguments must match exactly.
   /// This uses an `unordered` compare if _args is a collection
@@ -206,7 +209,7 @@ class ArgumentMatcher {
     switch (_type) {
       case _MatcherType.Exact:
         return _args == arguments ||
-            collectionEquality.equals(arguments, _args);
+            _collectionEquality.equals(arguments, _args);
 
       case _MatcherType.Partial:
         if (arguments is Map && _args is Map) {
@@ -217,7 +220,7 @@ class ArgumentMatcher {
           return match.keys.every((key) =>
               argMap.containsKey(key) &&
               (argMap[key] == match[key] ||
-                  collectionEquality.equals(match[key], argMap[key])));
+                  _collectionEquality.equals(match[key], argMap[key])));
         }
         break;
     }

@@ -13,6 +13,7 @@ doc/api/
 
 # Directories that are created by flutter that we don't actually need checked in
 ios/*
+.flutter-plugins*
 
 # IDE files
 .idea/
