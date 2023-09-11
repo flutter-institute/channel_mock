@@ -1,3 +1,9 @@
+## [2.0.0+4] - 2023-09-11
+
+* Updating dependencies to latest version
+* Updating example to be up-to-date
+* Fixing dart analysis issues
+
 ## [2.0.0+3] - 2022-09-27
 
 * Updating status badge to Codemagic
