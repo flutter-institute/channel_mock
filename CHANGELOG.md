@@ -1,4 +1,4 @@
-## [2.0.0+4] - 2023-09-11
+## [2.0.1] - 2023-09-11
 
 * Updating dependencies to latest version
 * Updating example to be up-to-date
